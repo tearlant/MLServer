@@ -16,12 +16,20 @@ namespace API.Controllers
         //    return HandleResult(result);
         //}
 
-        [HttpPost("/tester")]
+        [HttpPost("tester")]
         public async Task<IActionResult> Test([FromForm] IngestFileFromForm<ImageModelInput, ImageModelOutput>.Command command)
         {
             var result = await Mediator.Send(command);
             return HandleResult(result);
         }
+
+        //[HttpPost("csvtester")]
+        //public async Task<IActionResult> CsvTest([FromForm] IngestFileFromForm<MNISTModelInput, MNISTModelOutput>.Command command)
+        //{
+        //    var result = await Mediator.Send(command);
+        //    return HandleResult(result);
+        //}
+
 
     }
 }

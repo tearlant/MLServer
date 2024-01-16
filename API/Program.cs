@@ -45,10 +45,10 @@ catch (Exception ex)
     logger.LogError(ex, "An error occurred during migration");
 }
 
-//var predictionService = services.GetRequiredService<IPredictionService<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>>();
-//var predictionService = services.GetRequiredService<IPredictionService<MNISTModelInput, MNISTModelOutput>>();
+var predictionService = services.GetRequiredService<IPredictionService<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>>();
 //var predictionService = services.GetRequiredService<IPredictionService<DeckCrackModelInput, DeckCrackModelOutput>>();
-var predictionService = services.GetRequiredService<IPredictionService<ImageModelInput, ImageModelOutput>>();
+var predictionService2 = services.GetRequiredService<IPredictionService<ImageModelInput, ImageModelOutput>>();
+//var predictionService3 = services.GetRequiredService<IPredictionService<MNISTModelInput, MNISTModelOutput>>();
 
 //var predictionHandler =
 //    (PredictionEnginePool<SentimentAnalysisModelInput, SentimentAnalysisModelOutput> predictionEnginePool, SentimentAnalysisModelInput input) =>

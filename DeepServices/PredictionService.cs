@@ -2,20 +2,26 @@
 using Domain;
 using Domain.Image;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.Analysis;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Transforms.Text;
+using System.Data;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using Tensorflow.Keras.Engine;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DeepServices
 {
+    internal interface IEmptyStruct { }
     public interface IPredictionService<T, S> where T : class, new() where S : class, new()
     {
         void LoadModel(string modelPath);
         Task<S?> PredictSingleDataPoint(T newDataPoint);
         void CreateImageIngestionPipelineForModelWithImageInput(string modelPath, int imageHeight, int imageWidth);
         Task<S?> PredictSingleDataPointFromForm(DataFromForm newDataPoint);
+        //Task<S> PredictSingleDataPointFromFormDataOnly(DataFromForm formData, bool v);
     }
 
     public class PredictionService<T, S> : IPredictionService<T, S> where T : class, new() where S : class, new()
@@ -24,7 +30,10 @@ namespace DeepServices
         private IEstimator<ITransformer>? _dataIngestionPipeline;
         private ITransformer? _trainedModel;
         private PredictionEngine<T, S>? _predEngine;
-        private PredictionEngine<ImageModelRawInput, T>? _preparationEngine;
+        private PredictionEngine<ImageModelRawInput, T>? _imagePreparationEngine;
+        //private PredictionEngine<IDataView, T>? _dataPreparationEngine;
+        //private string[] _inputColumnNames;
+        //private string[] _outputColumnNames;
 
         public PredictionService(string modelPath)
         {
@@ -65,7 +74,7 @@ namespace DeepServices
 
             var outputSchema2 = dataPrepPipeline.GetOutputSchema(dataView.Schema);
 
-            _preparationEngine = _mlContext.Model.CreatePredictionEngine<ImageModelRawInput, T>(dataPrepPipeline);
+            _imagePreparationEngine = _mlContext.Model.CreatePredictionEngine<ImageModelRawInput, T>(dataPrepPipeline);
 
             _trainedModel = _mlContext.Model.Load(modelPath, out var modelInputSchema);
             _predEngine = _mlContext.Model.CreatePredictionEngine<T, S>(_trainedModel);
@@ -74,7 +83,7 @@ namespace DeepServices
         public async Task<S?> PredictSingleDataPointFromForm(DataFromForm newDataPoint)
         {
 
-            if (_preparationEngine == null)
+            if (_imagePreparationEngine == null)
             {
                 // TODO: Fail gracefully
                 throw new Exception("Preparation Pipeline has not been initialized");
@@ -87,10 +96,10 @@ namespace DeepServices
             }
 
             // TODO: Much more input validation. For now assume it's an image
-            var inputData = await CreateImageInputData(newDataPoint.File);
+            var inputData = await CreateImageInputData(newDataPoint.Image);
 
             //var processedData = _dataIngestionPipeline.Fit(newDataPoint);
-            var preppedData = _preparationEngine.Predict(inputData);
+            var preppedData = _imagePreparationEngine.Predict(inputData);
             var resultprediction1 = _predEngine.Predict(preppedData);
 
             if (resultprediction1 != null)
@@ -101,6 +110,14 @@ namespace DeepServices
             return await Task.FromResult(resultprediction1);
 
         }
+
+        //public async Task<S?> PredictSingleDataPointFromFormDataOnly(DataFromForm newDataPoint, bool hasHeader)
+        //{
+
+        //    var inputData = await CreateColumnInputData(newDataPoint.Data, hasHeader);
+        //    return await PredictSingleDataPoint(inputData);
+
+        //}
 
         public async Task<S?> PredictSingleDataPoint(T newDataPoint)
         {
@@ -143,6 +160,41 @@ namespace DeepServices
             }
 
             return imageModelInput;
+        }
+
+        public async Task<T> CreateColumnInputData(IFormFile data, bool hasHeader)
+        {
+            T t = null;
+            try
+            {
+                using (var reader = new StreamReader(data.OpenReadStream()))
+                {
+                    var dataCsv = reader.ReadToEnd();
+                    var df = DataFrame.LoadCsvFromString(dataCsv, header: hasHeader);
+
+                    var names = df.Columns.Select(x => x.Name).ToArray();
+
+                    // TODO: This is ugly, but it works. There should be a better way.
+                    var emptyData = new List<IEmptyStruct>();
+                    var dataView = _mlContext.Data.LoadFromEnumerable(emptyData);
+
+                    Action<T, T> convertDataType2 = (input, output) => { };
+                    var convertDataTypePipeline = _mlContext.Transforms.CustomMapping(convertDataType2, "convertDataType2");
+
+                    var dataPrepPipeline = convertDataTypePipeline.Fit(dataView);
+
+                    var outputSchema2 = dataPrepPipeline.GetOutputSchema(dataView.Schema);
+
+                    var dataPreparationEngine = _mlContext.Model.CreatePredictionEngine<IEmptyStruct, T>(dataPrepPipeline);
+                    //t = dataPreparationEngine.Predict(df);
+                }
+            }
+            catch (Exception ex)
+            {
+                // handle exception
+            }
+            return t;
+
         }
 
     }

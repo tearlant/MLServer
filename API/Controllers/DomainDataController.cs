@@ -3,7 +3,9 @@ using Application.MLOperations;
 using Domain;
 using Domain.SentimentAnalysis;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Text;
 
 namespace API.Controllers
 {
@@ -46,8 +48,23 @@ namespace API.Controllers
         [HttpPost("pred")]
         public async Task<ActionResult<SentimentAnalysisModelOutput>> PredictDataPoint(SentimentAnalysisModelInput input)
         {
-            return await Mediator.Send(new Predict<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>.Command { ModelInput = input });
+            return await Mediator.Send(new PredictFromJSON<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>.Command { ModelInput = input });
         }
+
+        [HttpPost("testjson")]
+        public async Task<IActionResult> TestJson([FromBody] string value)
+        {
+            string jsonString;
+            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
+            {
+                jsonString = await reader.ReadToEndAsync();
+            }
+
+            var res = Task.FromResult(42);
+            await res;
+            return Ok();
+        }
+
 
     }
 }

@@ -5,9 +5,15 @@ namespace Domain
 {
     public class DataFromForm
     {
-        [ColumnName("File")]
-        public IFormFile File { get; set; }
-        public string Type { get; set; }
-        public string Options { get; set; }
+        [ColumnName("Image")]
+        public IFormFile Image { get; set; }
+
+        //[ColumnName("Data")]
+        //public IFormFile Data { get; set; }
+
+        //public string DataDelimiter { get; set; } = ",";
+
+        //public bool HasHeader { get; set; } = true;
+
     }
 }

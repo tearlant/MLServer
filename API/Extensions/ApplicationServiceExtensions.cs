@@ -11,6 +11,7 @@ using Microsoft.ML;
 using Domain.DeckCrack;
 using Domain.Image;
 using Application.DataIngestion;
+using ShallowServices;
 
 namespace API.Extensions
 {
@@ -34,6 +35,11 @@ namespace API.Extensions
                     policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
                 });
             });
+
+            services.AddMvc(options => {
+                options.InputFormatters.Insert(0, new RawJsonBodyInputFormatter());
+            });
+
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
 
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
@@ -44,20 +50,16 @@ namespace API.Extensions
 
             services.AddSingleton<IPredictionService<ImageModelInput, ImageModelOutput>>(serviceProvider => new PredictionService<ImageModelInput, ImageModelOutput>("InitialModels/FlowersModel.zip", 224, 224));
 
-            //services.AddSingleton<IPredictionService<MNISTModelInput, MNISTModelOutput>>(serviceProvider => new PredictionService<MNISTModelInput, MNISTModelOutput>("InitialModels/DeckCrackModel.zip", 256, 256));
-            //services.AddSingleton<IPredictionService<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>>(serviceProvider => new PredictionService<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>("InitialModels/SentimentModel.zip"));
-            //services.AddSingleton<IPredictionService<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>>();
+            //services.AddSingleton<IPredictionService<MNISTModelInput, MNISTModelOutput>>(serviceProvider => new PredictionService<MNISTModelInput, MNISTModelOutput>("InitialModels/MNISTModel.zip"));
+            services.AddSingleton<IPredictionService<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>>(serviceProvider => new PredictionService<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>("InitialModels/SentimentModel.zip"));
 
             // TODO: There should be a better way of doing this. Currently, this follows a quick and dirty solution found at
             // https://stackoverflow.com/questions/73760859/mediatr-generic-handlers
-            //services.AddTransient<IRequestHandler<Predict<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>.Command, SentimentAnalysisModelOutput>, Predict<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>.Handler>();
-            //services.AddTransient<IRequestHandler<Predict<MNISTModelInput, MNISTModelOutput>.Command, MNISTModelOutput>, Predict<MNISTModelInput, MNISTModelOutput>.Handler>();
-            //services.AddTransient<IRequestHandler<AddRawImage<MNISTModelInput>.Command, Result<MNISTModelInput>>, AddRawImage<MNISTModelInput>.Handler>();
-            //services.AddTransient<IRequestHandler<Predict<DeckCrackModelInput, DeckCrackModelOutput>.Command, DeckCrackModelOutput>, Predict<DeckCrackModelInput, DeckCrackModelOutput>.Handler>();
-            //services.AddTransient<IRequestHandler<AddRawImage<DeckCrackModelInput>.Command, Result<DeckCrackModelInput>>, AddRawImage<DeckCrackModelInput>.Handler>();
-            
-            services.AddTransient<IRequestHandler<Predict<ImageModelInput, ImageModelOutput>.Command, ImageModelOutput>, Predict<ImageModelInput, ImageModelOutput>.Handler>();
+            services.AddTransient<IRequestHandler<PredictFromJSON<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>.Command, SentimentAnalysisModelOutput>, PredictFromJSON<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>.Handler>();
+
+            //services.AddTransient<IRequestHandler<PredictFromForm<ImageModelInput, ImageModelOutput>.Command, ImageModelOutput>, PredictFromForm<ImageModelInput, ImageModelOutput>.Handler>();
             services.AddTransient<IRequestHandler<IngestFileFromForm<ImageModelInput, ImageModelOutput>.Command, Result<ImageModelOutput>>, IngestFileFromForm<ImageModelInput, ImageModelOutput>.Handler>();
+            //services.AddTransient<IRequestHandler<IngestFileFromForm<MNISTModelInput, MNISTModelOutput>.Command, Result<MNISTModelOutput>>, IngestFileFromForm<MNISTModelInput, MNISTModelOutput>.Handler>();
 
             string path = Directory.GetCurrentDirectory();
             Console.WriteLine("The current directory is {0}", path);
