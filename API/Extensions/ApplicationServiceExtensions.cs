@@ -48,7 +48,7 @@ namespace API.Extensions
             //services.AddPredictionEnginePool<MNISTModelInput, MNISTModelOutput>().FromFile(modelName: "PretrainedMNISTModel", filePath: "InitialModels/MNIST.zip", watchForChanges: true);
             //services.AddPredictionEnginePool<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>().FromFile(modelName: "SentimentAnalysisModel", filePath: "InitialModels/SentimentModel.zip", watchForChanges: true);
 
-            services.AddSingleton<IPredictionService<ImageModelInput, ImageModelOutput>>(serviceProvider => new PredictionService<ImageModelInput, ImageModelOutput>("InitialModels/FlowersModel.zip", 224, 224));
+            services.AddSingleton<IPredictionService<ImageModelInput, ImageModelOutput>>(serviceProvider => new PredictionService<ImageModelInput, ImageModelOutput>("InitialModels/FlowersModelCopy.zip", 224, 224));
 
             //services.AddSingleton<IPredictionService<MNISTModelInput, MNISTModelOutput>>(serviceProvider => new PredictionService<MNISTModelInput, MNISTModelOutput>("InitialModels/MNISTModel.zip"));
             services.AddSingleton<IPredictionService<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>>(serviceProvider => new PredictionService<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>("InitialModels/SentimentModel.zip"));
