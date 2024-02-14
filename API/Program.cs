@@ -1,6 +1,5 @@
 using API.Extensions;
 using DeepServices;
-using Domain.SentimentAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Domain.Image;
