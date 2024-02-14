@@ -12,20 +12,20 @@ namespace Application.BusinessLogic
 {
     public class Details
     {
-        public class Query : IRequest<DomainSpecificDataItem> {
+        public class Query : IRequest<MLModel> {
             public Guid Id { get; set; }
         }
 
-        public class Handler : IRequestHandler<Query, DomainSpecificDataItem>
+        public class Handler : IRequestHandler<Query, MLModel>
         {
             private readonly DataContext _context;
             public Handler(DataContext context)
             {
                 _context = context;
             }
-            public async Task<DomainSpecificDataItem> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<MLModel> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.DomainSpecificDataItems.FindAsync(request.Id);
+                return await _context.MLModels.FindAsync(request.Id);
             }
         }
     }

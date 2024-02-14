@@ -22,7 +22,7 @@ namespace Application.BusinessLogic
 
             public async Task Handle(Command request, CancellationToken cancellationToken)
             {
-                var dataItem = await _context.DomainSpecificDataItems.FindAsync(request.Id);
+                var dataItem = await _context.MLModels.FindAsync(request.Id);
                 _context.Remove(dataItem);
                 await _context.SaveChangesAsync();
             }

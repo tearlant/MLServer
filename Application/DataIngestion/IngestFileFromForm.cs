@@ -31,8 +31,6 @@ namespace Application.DataIngestion
             public async Task<Result<S>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var image = request.FormData.Image;
-                //var data = request.FormData.Data;
-                //var hasHeader = request.FormData.HasHeader;
 
                 // TODO: Input validation
                 string[] validExtensions = { ".jpg", ".png" };
@@ -47,24 +45,7 @@ namespace Application.DataIngestion
                     return Result<S>.Failure("No file attached");
                 }
 
-                // TODO: Use factory pattern
-                // TODO: Ingest ImageOptions and CSVOptions
-                //IFileOptions opts;
-                //if (fileType == FileType.Image) {
-                //    opts = new ImageOptions { };
-                //    _mapper.Map(request.FormData.Options, opts);
-                //}
-                //else {
-                //    opts = new CSVOptions { };
-                //    _mapper.Map(request.FormData.Options, opts);
-                //}
-
-                //request.FormData.Options = opts;
-
-                //_predictionService.CreateImageIngestionPipelineForModelWithVectorInput("InitialModels/MNIST.zip", 8, "PixelValues");
-
                 var pred = await _predictionService.PredictSingleDataPointFromForm(request.FormData);
-                //var pred = await _predictionService.PredictSingleDataPointFromFormDataOnly(request.FormData, hasHeader);
 
                 return Result<S>.Success(pred);
             }

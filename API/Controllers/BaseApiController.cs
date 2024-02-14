@@ -1,4 +1,6 @@
 ﻿using Application.Core;
+using DeepServices;
+using Domain.Image;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,8 +11,11 @@ namespace API.Controllers
     public class BaseApiController : ControllerBase
     {
         private IMediator _mediator;
+        private IPredictionService<ImageModelInput, ImageModelOutput> _predictionService;
 
         protected IMediator Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>();
+
+        protected IPredictionService<ImageModelInput, ImageModelOutput> PredictionService => _predictionService ??= HttpContext.RequestServices.GetService<IPredictionService<ImageModelInput, ImageModelOutput>>();
 
         protected ActionResult HandleResult<T>(Result<T> result)
         {

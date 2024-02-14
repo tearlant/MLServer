@@ -1,11 +1,8 @@
 using API.Extensions;
 using DeepServices;
 using Domain.SentimentAnalysis;
-using Domain.MNIST;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.ML;
 using Persistence;
-using Domain.DeckCrack;
 using Domain.Image;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,17 +42,6 @@ catch (Exception ex)
     logger.LogError(ex, "An error occurred during migration");
 }
 
-var predictionService = services.GetRequiredService<IPredictionService<SentimentAnalysisModelInput, SentimentAnalysisModelOutput>>();
-//var predictionService = services.GetRequiredService<IPredictionService<DeckCrackModelInput, DeckCrackModelOutput>>();
-var predictionService2 = services.GetRequiredService<IPredictionService<ImageModelInput, ImageModelOutput>>();
-//var predictionService3 = services.GetRequiredService<IPredictionService<MNISTModelInput, MNISTModelOutput>>();
-
-//var predictionHandler =
-//    (PredictionEnginePool<SentimentAnalysisModelInput, SentimentAnalysisModelOutput> predictionEnginePool, SentimentAnalysisModelInput input) =>
-//    {
-//        return predictionEnginePool.Predict(modelName: "SentimentAnalysisModel", input);
-//    };
-
-//app.MapPost("/predict", predictionHandler);
+var predictionService = services.GetRequiredService<IPredictionService<ImageModelInput, ImageModelOutput>>();
 
 app.Run();

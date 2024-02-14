@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Application.Core;
+using Domain;
 using MediatR;
 using Persistence;
 
@@ -6,22 +7,25 @@ namespace Application.BusinessLogic
 {
     public class Create
     {
-        public class Command : IRequest
+        public class Command : IRequest<Result<MLModelMetadata>>
         {
-            public DomainSpecificDataItem DataItem { get; set; }
+            public MLModel Model { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, Result<MLModelMetadata>>
         {
             private readonly DataContext _context;
             public Handler(DataContext context)
             {
                 _context = context;
             }
-            public async Task Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<MLModelMetadata>> Handle(Command request, CancellationToken cancellationToken)
             {
-                _context.DomainSpecificDataItems.Add(request.DataItem);
-                await _context.SaveChangesAsync();
+                //request.Model.Id = request.Model.Id ?? Guid.NewGuid();
+                _context.MLModels.Add(request.Model);
+                var result = await _context.SaveChangesAsync();
+                var metadata = new MLModelMetadata { Id = request.Model.Id, Title = request.Model.Title };
+                return Result<MLModelMetadata>.Success(metadata);
             }
         }
 

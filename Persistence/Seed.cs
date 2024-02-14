@@ -6,43 +6,33 @@ namespace Persistence
     {
         public static async Task SeedData(DataContext context)
         {
-            if (context.DomainSpecificDataItems.Any()) return;
+            if (context.MLModels.Any()) return;
 
-            var domainSpecificDataItems = new List<DomainSpecificDataItem>
+            var domainSpecificDataItems = new List<MLModel>
             {
-                new DomainSpecificDataItem
-                {
-                    Title = "Item 1",
-                    Date = DateTime.UtcNow.AddMonths(-2),
-                    Value = 1,
-                },
-                new DomainSpecificDataItem
-                {
-                    Title = "Item 2",
-                    Date = DateTime.UtcNow.AddMonths(-1),
-                    Value = 2,
-                },
-                new DomainSpecificDataItem
-                {
-                    Title = "Item 3",
-                    Date = DateTime.UtcNow,
-                    Value = 3,
-                },
-                new DomainSpecificDataItem
-                {
-                    Title = "Item 4",
-                    Date = DateTime.UtcNow.AddDays(14),
-                    Value = 4,
-                },
-                new DomainSpecificDataItem
-                {
-                    Title = "Item 5",
-                    Date = DateTime.UtcNow.AddMonths(1),
-                    Value = 5,
-                },
+               // new MLModel
+               // {
+               //     Title = "Item 1",
+               // },
+               // new MLModel
+               // {
+               //     Title = "Item 2",
+               //},
+               // new MLModel
+               // {
+               //     Title = "Item 3",
+               // },
+               // new MLModel
+               // {
+               //     Title = "Item 4",
+               // },
+               // new MLModel
+               // {
+               //     Title = "Item 5",
+               // },
             };
 
-            await context.DomainSpecificDataItems.AddRangeAsync(domainSpecificDataItems);
+            await context.MLModels.AddRangeAsync(domainSpecificDataItems);
             await context.SaveChangesAsync();
         }
     }

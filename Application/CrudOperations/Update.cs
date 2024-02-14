@@ -9,7 +9,7 @@ namespace Application.BusinessLogic
     {
         public class Command : IRequest
         {
-            public DomainSpecificDataItem DataItem { get; set; }
+            public MLModel Model { get; set; }
         }
 
         public class Handler : IRequestHandler<Command>
@@ -24,8 +24,8 @@ namespace Application.BusinessLogic
             }
             public async Task Handle(Command request, CancellationToken cancellationToken)
             {
-                var dataItem = await _context.DomainSpecificDataItems.FindAsync(request.DataItem.Id);
-                _mapper.Map(request.DataItem, dataItem);
+                var dataItem = await _context.MLModels.FindAsync(request.Model.Id);
+                _mapper.Map(request.Model, dataItem);
                 await _context.SaveChangesAsync();
             }
         }

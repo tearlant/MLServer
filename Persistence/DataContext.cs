@@ -7,7 +7,7 @@ namespace Persistence
     {
         public DataContext(DbContextOptions options) : base(options) { }
 
-        public DbSet<DomainSpecificDataItem> DomainSpecificDataItems {get; set;}
+        public DbSet<MLModel> MLModels {get; set;}
 
 
     }
