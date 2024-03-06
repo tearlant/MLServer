@@ -28,6 +28,9 @@ namespace API.Controllers
 
                 var sessionId = HttpContext.Session.Id;
 
+                // Something needs to be set.
+                HttpContext.Session.SetString("A", "Bee");
+
                 await PredictionService.LoadModelAsync(sessionId, tempPath, 224, 224);
                 return Ok();
             }
@@ -62,6 +65,9 @@ namespace API.Controllers
         [HttpPost("predict")]
         public async Task<IActionResult> Predict([FromForm] IngestFileFromForm<ImageModelInput, ImageModelOutput>.Command command)
         {
+            // Something needs to be set.
+            HttpContext.Session.SetString("A", "Bee");
+
             var result = await Mediator.Send(command);
             return HandleResult(result);
         }

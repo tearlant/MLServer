@@ -28,6 +28,7 @@ namespace Application.DataIngestion
             {
                 _mapper = mapper;
                 _predictionService = predictionService;
+                _httpContextAccessor = httpContextAccessor;
             }
             public async Task<Result<S>> Handle(Command request, CancellationToken cancellationToken)
             {
