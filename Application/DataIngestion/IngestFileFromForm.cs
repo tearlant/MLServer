@@ -22,14 +22,18 @@ namespace Application.DataIngestion
         {
             private readonly IMapper _mapper;
             private readonly IPredictionService<T, S> _predictionService;
+            private readonly IHttpContextAccessor _httpContextAccessor;
 
-            public Handler(IMapper mapper, IPredictionService<T, S> predictionService)
+            public Handler(IMapper mapper, IPredictionService<T, S> predictionService, IHttpContextAccessor httpContextAccessor)
             {
                 _mapper = mapper;
                 _predictionService = predictionService;
             }
             public async Task<Result<S>> Handle(Command request, CancellationToken cancellationToken)
             {
+                var httpContext = _httpContextAccessor.HttpContext;
+                var sessionId = httpContext.Session.Id;
+
                 var image = request.FormData.Image;
 
                 // TODO: Input validation
@@ -45,7 +49,7 @@ namespace Application.DataIngestion
                     return Result<S>.Failure("No file attached");
                 }
 
-                var pred = await _predictionService.PredictSingleDataPointFromForm(request.FormData);
+                var pred = await _predictionService.PredictSingleDataPointFromFormAsync(sessionId, request.FormData);
 
                 return Result<S>.Success(pred);
             }

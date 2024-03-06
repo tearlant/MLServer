@@ -23,7 +23,7 @@ namespace Application.BusinessLogic
             {
                 //request.Model.Id = request.Model.Id ?? Guid.NewGuid();
                 _context.MLModels.Add(request.Model);
-                var result = await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
                 var metadata = new MLModelMetadata { Id = request.Model.Id, Title = request.Model.Title };
                 return Result<MLModelMetadata>.Success(metadata);
             }

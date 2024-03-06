@@ -1,5 +1,4 @@
 ﻿using Microsoft.ML.Data;
-using Microsoft.ML.Transforms.Image;
 
 namespace Domain.Image
 {

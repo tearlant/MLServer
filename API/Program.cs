@@ -1,8 +1,6 @@
 using API.Extensions;
-using DeepServices;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
-using Domain.Image;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +18,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseSession();
+
 app.UseHttpsRedirection();
+
+app.UseCors("ReactCorsPolicy");
 
 app.UseAuthorization();
 
@@ -40,7 +42,5 @@ catch (Exception ex)
     var logger = services.GetRequiredService<ILogger<Program>>();
     logger.LogError(ex, "An error occurred during migration");
 }
-
-var predictionService = services.GetRequiredService<IPredictionService<ImageModelInput, ImageModelOutput>>();
 
 app.Run();

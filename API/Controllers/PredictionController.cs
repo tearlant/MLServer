@@ -1,4 +1,5 @@
 ﻿using Application.BusinessLogic;
+using Application.Core;
 using Application.DataIngestion;
 using Domain;
 using Domain.Image;
@@ -25,7 +26,9 @@ namespace API.Controllers
                     stream.Write(data, 0, data.Length);
                 }
 
-                PredictionService.CreateImageIngestionPipelineForModelWithImageInput(tempPath, 224, 224);
+                var sessionId = HttpContext.Session.Id;
+
+                await PredictionService.LoadModelAsync(sessionId, tempPath, 224, 224);
                 return Ok();
             }
         }
@@ -45,7 +48,12 @@ namespace API.Controllers
                     stream.Write(model, 0, model.Length);
                 }
 
-                PredictionService.CreateImageIngestionPipelineForModelWithImageInput(targetPath, 224, 224);
+                var sessionId = HttpContext.Session.Id;
+
+                // Something needs to be set.
+                HttpContext.Session.SetString("A", "Bee");
+
+                await PredictionService.LoadModelAsync(sessionId, targetPath, 224, 224);
             }
 
             return Ok();
@@ -58,5 +66,17 @@ namespace API.Controllers
             return HandleResult(result);
         }
 
+        [HttpGet("labels")]
+        public async Task<IActionResult> GetLabels()
+        {
+
+            var labels = await PredictionService.GetLabelsAsync(HttpContext.Session.Id);
+
+            // Something needs to be set.
+            HttpContext.Session.SetString("A", "Bee");
+
+            Result<List<string>> result = labels != null ? Result<List<string>>.Success(labels) : Result<List<string>>.Failure("No labels found");
+            return HandleResult(result);
+        }
     }
 }

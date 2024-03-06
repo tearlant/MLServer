@@ -2,54 +2,63 @@
 using Application.Core;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
-using DeepServices;
 using MediatR;
 using Domain.Image;
 using Application.DataIngestion;
 using ShallowServices;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using DeepServices;
 
 namespace API.Extensions
 {
-
     public static class ApplicationServiceExtensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
         {
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            services.AddEndpointsApiExplorer();
+            // Register IHttpContextAccessor
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddSwaggerGen();
+
+            // For prototyping, this just uses a SQLite database
             services.AddDbContext<DataContext>(opt =>
             {
                 opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
             });
-            services.AddCors(opt =>
-            {
-                opt.AddPolicy("CorsPolicy", policy =>
-                {
-                    // React
-                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
-                });
-            });
 
+            // This is no longer used after CSV inputs were descoped, but it is still useful while debugging
             services.AddMvc(options => {
                 options.InputFormatters.Insert(0, new RawJsonBodyInputFormatter());
             });
 
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
+            services.AddCors(opt =>
+            {
+                opt.AddPolicy("ReactCorsPolicy", builder => {
+                    builder.AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .SetIsOriginAllowed(origin => origin == "http://localhost:3000" || origin == "http://localhost:8080" || origin == "https://localhost:8080" || origin == "http://localhost" || origin == "https://localhost")
+                        .AllowCredentials(); // Allow credentials if needed
+                });
+            });
 
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Ensure the cookie is sent over HTTPS
+                options.IdleTimeout = TimeSpan.FromMinutes(10);
+            });
+
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
-            // According to the documentation, this should work. But it doesn't, so the workaround follows.
-            //services.AddPredictionEnginePool<ImageModelInput, ImageModelOutput>().FromFile(modelName: "ImagePredictionModel", filePath: "path/to/model.zip", watchForChanges: true);
-
-            services.AddSingleton<IPredictionService<ImageModelInput, ImageModelOutput>>(serviceProvider => new PredictionService<ImageModelInput, ImageModelOutput>("InitialModels/FlowersModelCopy.zip", 224, 224));
+            services.AddSingleton<IPredictionService<ImageModelInput, ImageModelOutput>, PredictionService<ImageModelInput, ImageModelOutput>>();
 
             // TODO: There should be a better way of doing this. Currently, this follows a quick and dirty solution found at
             // https://stackoverflow.com/questions/73760859/mediatr-generic-handlers
             services.AddTransient<IRequestHandler<IngestFileFromForm<ImageModelInput, ImageModelOutput>.Command, Result<ImageModelOutput>>, IngestFileFromForm<ImageModelInput, ImageModelOutput>.Handler>();
-
-            string path = Directory.GetCurrentDirectory();
-            Console.WriteLine("The current directory is {0}", path);
 
             return services;
         }
