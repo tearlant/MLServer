@@ -34,7 +34,7 @@ namespace DeepServices
 
         private Dictionary<string, SessionModelData<T, S>> _modelDataDictionary = new Dictionary<string, SessionModelData<T, S>>();
 
-        public PredictionService(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        public PredictionService(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor, TimeSpan.FromMinutes(20), TimeSpan.FromMinutes(10))
         {
             _mlContext = new MLContext();
 
@@ -44,6 +44,7 @@ namespace DeepServices
 
         public async Task LoadModelAsync(string sessionId, string modelPath, int imageHeight, int imageWidth)
         {
+            await UpdateSessionAsync();
             CreateImageIngestionPipelineForModelWithImageInput(sessionId, modelPath, imageHeight, imageWidth);
         }
 
