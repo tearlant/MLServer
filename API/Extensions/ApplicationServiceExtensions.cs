@@ -31,12 +31,22 @@ namespace API.Extensions
                 options.InputFormatters.Insert(0, new RawJsonBodyInputFormatter());
             });
 
+            var acceptableOrigins = new List<string> {
+                "http://localhost:3000",
+                "https://localhost:3000",
+                "https://localhost:443",
+                "http://localhost:8080",
+                "https://localhost:8080",
+                "http://localhost",
+                "https://localhost"
+            };
+
             services.AddCors(opt =>
             {
                 opt.AddPolicy("ReactCorsPolicy", builder => {
                     builder.AllowAnyHeader()
                         .AllowAnyMethod()
-                        .SetIsOriginAllowed(origin => origin == "http://localhost:3000" || origin == "http://localhost:8080" || origin == "https://localhost:8080" || origin == "http://localhost" || origin == "https://localhost")
+                        .SetIsOriginAllowed(origin => acceptableOrigins.Contains(origin))
                         .AllowCredentials(); // Allow credentials if needed
                 });
             });

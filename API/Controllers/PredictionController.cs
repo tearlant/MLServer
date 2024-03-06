@@ -10,7 +10,7 @@ namespace API.Controllers
     public class PredictionController : BaseApiController
     {
         [HttpPost("ingestanduse")]
-        public async Task<IActionResult> IngestAndUseModel([FromForm] MLModelFormData model)
+        public async Task<IActionResult> IngestAndUseModel([FromForm] MLModelFormData model, bool saveToDatabase = false)
         {
             using (MemoryStream ms = new MemoryStream())
             {
@@ -32,6 +32,14 @@ namespace API.Controllers
                 HttpContext.Session.SetString("A", "Bee");
 
                 await PredictionService.LoadModelAsync(sessionId, tempPath, 224, 224);
+
+                if (saveToDatabase)
+                {
+                    var modelToSave = new MLModel { Title = model.Title, TrainedModel = data };
+                    var result = await Mediator.Send(new Create.Command { Model = modelToSave });
+                    return HandleResult(result);
+                }
+
                 return Ok();
             }
         }

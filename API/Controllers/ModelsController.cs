@@ -31,6 +31,24 @@ namespace API.Controllers
 
                 var result = await Mediator.Send(new Create.Command { Model = modelToSave });
 
+                if (result != null)
+                {
+                    var guid = Guid.NewGuid();
+                    var targetPath = $"C:\\Target\\{guid}.zip";
+
+                    using (var stream = System.IO.File.Create(targetPath))
+                    {
+                        stream.Write(data, 0, data.Length);
+                    }
+
+                    var sessionId = HttpContext.Session.Id;
+
+                    // Something needs to be set.
+                    HttpContext.Session.SetString("A", "Bee");
+
+                    await PredictionService.LoadModelAsync(sessionId, targetPath, 224, 224);
+                }
+
                 return HandleResult(result);
             }
         }
