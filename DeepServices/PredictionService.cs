@@ -2,14 +2,18 @@
 using Domain;
 using Domain.Image;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.Analysis;
+using Microsoft.Extensions.Options;
 using Microsoft.ML;
 using Microsoft.ML.Data;
-using System.Data;
-using Tensorflow;
+using System.Runtime.InteropServices;
 
 namespace DeepServices
 {
+    public class PredictionServiceCachingOptions
+    {
+        public string DirectoryName { get; set; } = string.Empty;
+    }
+
     internal interface IEmptyStruct { }
     internal class SessionModelData<T, S> where T : class, new() where S : class, new()
     {
@@ -23,6 +27,7 @@ namespace DeepServices
         Task LoadModelAsync(string sessionId, string modelPath, int imageHeight, int imageWidth);
         Task<S?> PredictSingleDataPointFromFormAsync(string sessionId, DataFromForm newDataPoint);
         Task<List<string>> GetLabelsAsync(string sessionId);
+        string CachingDirectory { get; }
     }
 
     public class PredictionService<T, S> : SessionHandlerBase, IPredictionService<T, S> where T : class, new() where S : class, new()
@@ -31,14 +36,21 @@ namespace DeepServices
 
         private IEstimator<ITransformer>? _dataIngestionPipeline;
         private PredictionEngine<ImageModelRawInput, T>? _imagePreparationEngine;
+        private readonly PredictionServiceCachingOptions _cachingOptions = new PredictionServiceCachingOptions();
 
         private Dictionary<string, SessionModelData<T, S>> _modelDataDictionary = new Dictionary<string, SessionModelData<T, S>>();
 
-        public PredictionService(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor, TimeSpan.FromMinutes(20), TimeSpan.FromMinutes(10))
+        public PredictionService(IHttpContextAccessor httpContextAccessor, IOptions<PredictionServiceCachingOptions> cachingOptions) : base(httpContextAccessor, TimeSpan.FromMinutes(20), TimeSpan.FromMinutes(10))
         {
             _mlContext = new MLContext();
+            _cachingOptions = cachingOptions.Value;
 
-            // For the sake of testing the API, create a session with id "TestSession"
+            if (!Directory.Exists(CachingDirectory))
+            {
+                Directory.CreateDirectory(CachingDirectory);
+            }
+
+            // For the sake of testing the API, create a session with id "TestSession" which will never be cleared.
             CreateImageIngestionPipelineForModelWithImageInput("TestSession", "InitialModels/Model-DIAM.zip", 224, 224);
         }
 
@@ -134,6 +146,28 @@ namespace DeepServices
             }
 
             return await Task.FromResult(names.ToList());
+        }
+
+        public string CachingDirectory
+        {
+            get {
+                string basePath;
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ||
+                    RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ||
+                    RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                }
+                else
+                {
+                    // Log a warning or error for unsupported platforms
+                    throw new PlatformNotSupportedException("Unknown Operating System");
+                }
+
+                return Path.Combine(basePath, "MLServer", _cachingOptions.DirectoryName);
+            }
+
         }
 
         protected override async Task OnNewSessionAsync(string sessionId)

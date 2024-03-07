@@ -64,6 +64,7 @@ namespace API.Extensions
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
+            services.Configure<PredictionServiceCachingOptions>(config.GetSection("PredictionServiceCachingOptions"));
             services.AddSingleton<IPredictionService<ImageModelInput, ImageModelOutput>, PredictionService<ImageModelInput, ImageModelOutput>>();
 
             // TODO: There should be a better way of doing this. Currently, this follows a quick and dirty solution found at

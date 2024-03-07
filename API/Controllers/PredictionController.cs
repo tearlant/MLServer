@@ -4,6 +4,7 @@ using Application.DataIngestion;
 using Domain;
 using Domain.Image;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace API.Controllers
 {
@@ -19,7 +20,12 @@ namespace API.Controllers
 
                 // TODO: Have a non-permanent path
                 var tempGuid = Guid.NewGuid();
-                var tempPath = $"C:\\Target\\{tempGuid}.zip";
+                var tempPath = Path.Combine(PredictionService.CachingDirectory, $"{tempGuid}.zip");
+                var directoryPath = Path.GetDirectoryName(tempPath);
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
 
                 using (var stream = System.IO.File.Create(tempPath))
                 {
@@ -51,7 +57,7 @@ namespace API.Controllers
 
             if (res != null)
             {
-                var targetPath = $"C:\\Target\\{id}.zip";
+                var targetPath = Path.Combine(PredictionService.CachingDirectory, $"{id}.zip");
                 var model = res.TrainedModel;
 
                 using (var stream = System.IO.File.Create(targetPath))

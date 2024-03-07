@@ -31,10 +31,15 @@ namespace API.Controllers
 
                 var result = await Mediator.Send(new Create.Command { Model = modelToSave });
 
-                if (result != null)
+                if (model.SaveToLocalCacheAndUse && result != null)
                 {
                     var guid = Guid.NewGuid();
-                    var targetPath = $"C:\\Target\\{guid}.zip";
+                    var targetPath = Path.Combine(PredictionService.CachingDirectory, $"{guid}.zip");
+                    var directoryPath = Path.GetDirectoryName(targetPath);
+                    if (!Directory.Exists(directoryPath))
+                    {
+                        Directory.CreateDirectory(directoryPath);
+                    }
 
                     using (var stream = System.IO.File.Create(targetPath))
                     {
