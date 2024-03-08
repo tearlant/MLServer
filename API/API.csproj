@@ -9,6 +9,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="InitialModels\Model-DIAMONDS.zip" />
+    <None Remove="InitialModels\Model-FLOWERS.zip" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="InitialModels\Model-DIAMONDS.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InitialModels\Model-FLOWERS.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 

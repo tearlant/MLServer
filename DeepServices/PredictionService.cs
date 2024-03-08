@@ -37,6 +37,7 @@ namespace DeepServices
         private IEstimator<ITransformer>? _dataIngestionPipeline;
         private PredictionEngine<ImageModelRawInput, T>? _imagePreparationEngine;
         private readonly PredictionServiceCachingOptions _cachingOptions = new PredictionServiceCachingOptions();
+        private readonly string _defaultModelPath = Path.Combine(AppContext.BaseDirectory, "InitialModels", "Model-DIAMONDS.zip");
 
         private Dictionary<string, SessionModelData<T, S>> _modelDataDictionary = new Dictionary<string, SessionModelData<T, S>>();
 
@@ -51,7 +52,8 @@ namespace DeepServices
             }
 
             // For the sake of testing the API, create a session with id "TestSession" which will never be cleared.
-            CreateImageIngestionPipelineForModelWithImageInput("TestSession", "InitialModels/Model-DIAM.zip", 224, 224);
+
+            CreateImageIngestionPipelineForModelWithImageInput("TestSession", _defaultModelPath, 224, 224);
         }
 
         public async Task LoadModelAsync(string sessionId, string modelPath, int imageHeight, int imageWidth)
@@ -172,7 +174,7 @@ namespace DeepServices
 
         protected override async Task OnNewSessionAsync(string sessionId)
         {
-            CreateImageIngestionPipelineForModelWithImageInput(sessionId, "InitialModels/Model-DIAM.zip", 224, 224);
+            CreateImageIngestionPipelineForModelWithImageInput(sessionId, _defaultModelPath, 224, 224);
 
         }
 

@@ -12,10 +12,11 @@ namespace API.Controllers
     {
         private IMediator _mediator;
         private IPredictionService<ImageModelInput, ImageModelOutput> _predictionService;
+        private IWebHostEnvironment _webHostEnvironment;
 
         protected IMediator Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>();
-
         protected IPredictionService<ImageModelInput, ImageModelOutput> PredictionService => _predictionService ??= HttpContext.RequestServices.GetService<IPredictionService<ImageModelInput, ImageModelOutput>>();
+        protected IWebHostEnvironment WebHostEnvironment => _webHostEnvironment ??= HttpContext.RequestServices.GetService<IWebHostEnvironment>();
 
         protected ActionResult HandleResult<T>(Result<T> result)
         {

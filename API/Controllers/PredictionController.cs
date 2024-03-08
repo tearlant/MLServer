@@ -51,7 +51,7 @@ namespace API.Controllers
         }
 
         [HttpGet("extractandsave/{id}")]
-        public async Task<ActionResult> GetDomainSpecificDataItemAndSave(Guid id)
+        public async Task<ActionResult> ExtractFromDatabaseAndSaveAndLoad(Guid id)
         {
             var res = await Mediator.Send(new Details.Query { Id = id });
 
