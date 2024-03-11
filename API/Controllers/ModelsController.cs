@@ -23,6 +23,8 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> StoreNewModel([FromForm] MLModelFormData model)
         {
+            if (SafeModeService.IsInSafeMode) return SafeModeErrorResult();
+
             using (MemoryStream ms = new MemoryStream())
             {
                 await model.TrainedModel.CopyToAsync(ms);
@@ -48,8 +50,8 @@ namespace API.Controllers
 
                     var sessionId = HttpContext.Session.Id;
 
-                    // Something needs to be set.
-                    HttpContext.Session.SetString("A", "Bee");
+                    // Something needs to be set for the cookie to be created
+                    HttpContext.Session.SetString("id", HttpContext.Session.Id);
 
                     await PredictionService.LoadModelAsync(sessionId, targetPath, 224, 224);
                 }
@@ -61,7 +63,8 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateModel(Guid id, [FromForm] MLModelFormData model)
         {
-            //model.Id = id;
+            if (SafeModeService.IsInSafeMode) return SafeModeErrorResult();
+
             using (MemoryStream ms = new MemoryStream())
             {
                 await model.TrainedModel.CopyToAsync(ms);
@@ -76,6 +79,8 @@ namespace API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteModel(Guid id)
         {
+            if (SafeModeService.IsInSafeMode) return SafeModeErrorResult();
+
             await Mediator.Send(new Delete.Command { Id = id });
             return Ok();
         }

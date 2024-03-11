@@ -8,6 +8,7 @@ using Application.DataIngestion;
 using ShallowServices;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using DeepServices;
+using API.Controllers;
 
 namespace API.Extensions
 {
@@ -70,6 +71,9 @@ namespace API.Extensions
             // TODO: There should be a better way of doing this. Currently, this follows a quick and dirty solution found at
             // https://stackoverflow.com/questions/73760859/mediatr-generic-handlers
             services.AddTransient<IRequestHandler<IngestFileFromForm<ImageModelInput, ImageModelOutput>.Command, Result<ImageModelOutput>>, IngestFileFromForm<ImageModelInput, ImageModelOutput>.Handler>();
+
+            services.Configure<SecurityOptions>(config.GetSection("Security"));
+            services.AddSingleton<SafeModeService>();
 
             return services;
         }

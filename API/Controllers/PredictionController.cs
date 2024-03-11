@@ -4,7 +4,6 @@ using Application.DataIngestion;
 using Domain;
 using Domain.Image;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace API.Controllers
 {
@@ -13,12 +12,13 @@ namespace API.Controllers
         [HttpPost("ingestanduse")]
         public async Task<IActionResult> IngestAndUseModel([FromForm] MLModelFormData model, bool saveToDatabase = false)
         {
+            if (SafeModeService.IsInSafeMode) return SafeModeErrorResult();
+
             using (MemoryStream ms = new MemoryStream())
             {
                 await model.TrainedModel.CopyToAsync(ms);
                 var data = ms.ToArray();
 
-                // TODO: Have a non-permanent path
                 var tempGuid = Guid.NewGuid();
                 var tempPath = Path.Combine(PredictionService.CachingDirectory, $"{tempGuid}.zip");
                 var directoryPath = Path.GetDirectoryName(tempPath);
@@ -34,8 +34,8 @@ namespace API.Controllers
 
                 var sessionId = HttpContext.Session.Id;
 
-                // Something needs to be set.
-                HttpContext.Session.SetString("A", "Bee");
+                // Something needs to be set for the cookie to be created
+                HttpContext.Session.SetString("id", HttpContext.Session.Id);
 
                 await PredictionService.LoadModelAsync(sessionId, tempPath, 224, 224);
 
@@ -53,6 +53,8 @@ namespace API.Controllers
         [HttpGet("extractandsave/{id}")]
         public async Task<ActionResult> ExtractFromDatabaseAndSaveAndLoad(Guid id)
         {
+            if (SafeModeService.IsInSafeMode) return SafeModeErrorResult();
+
             var res = await Mediator.Send(new Details.Query { Id = id });
 
             if (res != null)
@@ -67,8 +69,8 @@ namespace API.Controllers
 
                 var sessionId = HttpContext.Session.Id;
 
-                // Something needs to be set.
-                HttpContext.Session.SetString("A", "Bee");
+                // Something needs to be set for the cookie to be created
+                HttpContext.Session.SetString("id", HttpContext.Session.Id);
 
                 await PredictionService.LoadModelAsync(sessionId, targetPath, 224, 224);
             }
@@ -79,8 +81,8 @@ namespace API.Controllers
         [HttpPost("predict")]
         public async Task<IActionResult> Predict([FromForm] IngestFileFromForm<ImageModelInput, ImageModelOutput>.Command command)
         {
-            // Something needs to be set.
-            HttpContext.Session.SetString("A", "Bee");
+            // Something needs to be set for the cookie to be created
+            HttpContext.Session.SetString("id", HttpContext.Session.Id);
 
             var result = await Mediator.Send(command);
             return HandleResult(result);
@@ -92,8 +94,8 @@ namespace API.Controllers
 
             var labels = await PredictionService.GetLabelsAsync(HttpContext.Session.Id);
 
-            // Something needs to be set.
-            HttpContext.Session.SetString("A", "Bee");
+            // Something needs to be set for the cookie to be created
+            HttpContext.Session.SetString("id", HttpContext.Session.Id);
 
             Result<List<string>> result = labels != null ? Result<List<string>>.Success(labels) : Result<List<string>>.Failure("No labels found");
             return HandleResult(result);

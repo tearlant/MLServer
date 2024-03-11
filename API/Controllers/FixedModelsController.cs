@@ -10,8 +10,8 @@ namespace API.Controllers
         {
             var sessionId = HttpContext.Session.Id;
 
-            // Something needs to be set.
-            HttpContext.Session.SetString("A", "Bee");
+            // Something needs to be set for the cookie to be created
+            HttpContext.Session.SetString("id", HttpContext.Session.Id);
 
             var modelPath = Path.Combine(AppContext.BaseDirectory, "InitialModels", "Model-FLOWERS.zip");
             await PredictionService.LoadModelAsync(sessionId, modelPath, 224, 224);
@@ -24,10 +24,24 @@ namespace API.Controllers
         {
             var sessionId = HttpContext.Session.Id;
 
-            // Something needs to be set.
-            HttpContext.Session.SetString("A", "Bee");
+            // Something needs to be set for the cookie to be created
+            HttpContext.Session.SetString("id", HttpContext.Session.Id);
 
             var modelPath = Path.Combine(AppContext.BaseDirectory, "InitialModels", "Model-DIAMONDS.zip");
+            await PredictionService.LoadModelAsync(sessionId, modelPath, 224, 224);
+
+            return Ok();
+        }
+
+        [HttpGet("animals")]
+        public async Task<ActionResult> UsePretrainedAnimalsModel()
+        {
+            var sessionId = HttpContext.Session.Id;
+
+            // Something needs to be set for the cookie to be created
+            HttpContext.Session.SetString("id", HttpContext.Session.Id);
+
+            var modelPath = Path.Combine(AppContext.BaseDirectory, "InitialModels", "Model-ANIMALS.zip");
             await PredictionService.LoadModelAsync(sessionId, modelPath, 224, 224);
 
             return Ok();

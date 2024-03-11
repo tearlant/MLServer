@@ -9,11 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="InitialModels\Model-ANIMALS.zip" />
     <None Remove="InitialModels\Model-DIAMONDS.zip" />
     <None Remove="InitialModels\Model-FLOWERS.zip" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="InitialModels\Model-ANIMALS.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="InitialModels\Model-DIAMONDS.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -27,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.13" />
     <PackageReference Include="Microsoft.Data.Analysis" Version="0.21.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.14">

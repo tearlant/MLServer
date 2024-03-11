@@ -95,11 +95,15 @@ namespace DataTrainer
             var outputSchema = model.GetOutputSchema(dataToModel.Schema);
             var outData = model.Transform(dataToModel);
 
-            if (modelOutputLocation != null)
+            var outputDirectory = Path.GetDirectoryName(modelOutputLocation);
+
+            if (!Directory.Exists(outputDirectory))
             {
-                mlContext.Model.Save(model, dataToModel.Schema, modelOutputLocation);
-                Console.WriteLine("The model is saved to {0}", modelOutputLocation);
+                Directory.CreateDirectory(outputDirectory);
             }
+
+            mlContext.Model.Save(model, dataToModel.Schema, modelOutputLocation);
+            Console.WriteLine("The model is saved to {0}", modelOutputLocation);
 
             return model;
         }
@@ -117,7 +121,7 @@ namespace DataTrainer
             IDataView prePredictionData = transform.Transform(testDataView);
             var prePredictionEngine = mlContext.Model.CreatePredictionEngine<ImageNetData, ImageNetDataForTFModel>(transform);
 
-            // Helpful to be able to load a saved model when debugging. Comment out this line if necessary
+            // Helpful to be able to load a saved model when debugging. Uncomment this line if necessary
             //ITransformer trainedModel = mlContext.Model.Load(modelOutputLocation, out var modelInputSchema);
             //var postPredictionData = trainedModel.Transform(prePredictionData);
 

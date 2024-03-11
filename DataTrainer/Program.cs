@@ -9,8 +9,14 @@ namespace DataTrainer
             [Option('d', "data_path", Required = true, HelpText = "Path to the folder where the training data is.")]
             public string DataPath { get; set; }
 
-            [Option('o', "output_path", Required = false, Default = "C:/Target/OutputDir", HelpText = "Path to the folder where the model ZIP file will be saved.")]
+            [Option('t', "tf_model_path", Required = false, HelpText = "Path to the TensorFlow file. (Defaults to included copy of tensorflow_inception_graph.pb, for now it must be a file with the same schema)")]
+            public string TFPath { get; set; }
+
+            [Option('o', "output_path", Required = false, Default = "Outputs", HelpText = "Path to the folder where the model ZIP file will be saved.")]
             public string OutputPath { get; set; }
+
+            [Option('f', "output_filename", Required = false, Default = "Model", HelpText = "Path to the folder where the model ZIP file will be saved.")]
+            public string OutputFilename { get; set; }
 
             [Option('n', "prediction_points", Required = false, Default = 10, HelpText = "Number of points to predict.")]
             public int PredictionPoints { get; set; }
@@ -21,18 +27,31 @@ namespace DataTrainer
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<Options>(args).WithParsed(options => {
-                var dataPath = GetAbsolutePath(Path.Combine(@"./", options.DataPath));
-                var modelsPath = GetAbsolutePath(Path.Combine(@"./", options.OutputPath));
-                var outputPath = Path.Combine(modelsPath, "Model.zip");
 
-                string assetsRelativePath = @"../../../assets";
-                string assetsPath = GetAbsolutePath(assetsRelativePath);
+                var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-                var inceptionPb = Path.Combine(assetsPath, "inputs", "inception", "tensorflow_inception_graph.pb");
+                var dataPath = Path.IsPathRooted(options.DataPath) ? options.DataPath : Path.Combine(baseDirectory, options.DataPath);
+                var modelsPath = Path.IsPathRooted(options.OutputPath) ? options.OutputPath : Path.Combine(baseDirectory, options.OutputPath);
+                var outputFilePath = Path.Combine(modelsPath, $"{options.OutputFilename}.zip");
+
+                var defaultTensorFlowPath = Path.Combine(baseDirectory, "assets", "inputs", "inception", "tensorflow_inception_graph.pb");
+
+                //string assetsRelativePath = @"../../../assets";
+                //string assetsPath = GetAbsolutePath(assetsRelativePath);
+
+                string tensorFlowPath;
+                if (options.TFPath != null)
+                {
+                    tensorFlowPath = Path.IsPathRooted(options.TFPath) ? options.TFPath : Path.Combine(baseDirectory, options.TFPath);
+                }
+                else
+                {
+                    tensorFlowPath = defaultTensorFlowPath;
+                }
 
                 try
                 {
-                    var modelScorer = new TFModelScorer(dataPath, inceptionPb, outputPath);
+                    var modelScorer = new TFModelScorer(dataPath, tensorFlowPath, outputFilePath);
                     modelScorer.FitModelAndScore(options.PredictionPoints);
                 }
                 catch (Exception ex)
@@ -43,16 +62,6 @@ namespace DataTrainer
                 ConsoleHelpers.ConsolePressAnyKey();
 
             });
-
-        }
-
-        public static string GetAbsolutePath(string relativePath)
-        {
-            //FileInfo _dataRoot = new FileInfo(typeof(Program).Assembly.Location);
-            var _dataRoot = AppDomain.CurrentDomain.BaseDirectory;
-            //string assemblyFolderPath = _dataRoot.Directory.FullName;
-            string fullPath = Path.Combine(_dataRoot, relativePath);
-            return fullPath;
         }
     }
 }

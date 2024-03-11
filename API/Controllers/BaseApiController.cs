@@ -3,6 +3,7 @@ using DeepServices;
 using Domain.Image;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ShallowServices;
 
 namespace API.Controllers
 {
@@ -13,9 +14,13 @@ namespace API.Controllers
         private IMediator _mediator;
         private IPredictionService<ImageModelInput, ImageModelOutput> _predictionService;
         private IWebHostEnvironment _webHostEnvironment;
+        private SafeModeService _safeModeService;
 
         protected IMediator Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>();
         protected IPredictionService<ImageModelInput, ImageModelOutput> PredictionService => _predictionService ??= HttpContext.RequestServices.GetService<IPredictionService<ImageModelInput, ImageModelOutput>>();
+        protected SafeModeService SafeModeService => _safeModeService ??= HttpContext.RequestServices.GetService<SafeModeService>();
+
+        // Not sure if this is still needed, but it determines path resolution, so I'm keeping it to be safe.
         protected IWebHostEnvironment WebHostEnvironment => _webHostEnvironment ??= HttpContext.RequestServices.GetService<IWebHostEnvironment>();
 
         protected ActionResult HandleResult<T>(Result<T> result)
@@ -29,6 +34,14 @@ namespace API.Controllers
                 return NotFound();
 
             return BadRequest(result.Error);
+        }
+
+        protected ActionResult SafeModeErrorResult()
+        {
+            return new BadRequestObjectResult(new { error = "API endpoints involving uploading models are disabled when running server in Safe Mode" })
+            {
+                StatusCode = 403
+            };
         }
     }
 }
