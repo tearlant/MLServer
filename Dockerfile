@@ -31,6 +31,11 @@ RUN dotnet publish "DataTrainer.csproj" -c Release -o /app/publish/DataTrainer
 
 # TODO: Remove this. It's helpful for debugging
 
+RUN ls -la /app
+RUN ls -la /app/publish
+RUN ls -la /app/publish/API
+RUN ls -la /app/publish/DataTrainer
+
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish/API .
