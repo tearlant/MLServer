@@ -17,6 +17,9 @@ jobs:
     - name: Create Docker container
       run: docker create --name my-container my-image
 
+    - name: Troubleshooting
+      run: docker exec -it my-container ls la /app
+
     - name: Extract API artifacts
       run: docker cp my-container:/app/publish/API ./api-artifacts
 
