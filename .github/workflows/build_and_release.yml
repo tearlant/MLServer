@@ -14,12 +14,22 @@ jobs:
     - name: Build Docker image
       run: docker build --progress plain -t my-image -f Dockerfile .
 
-    - name: Extract API and DataTrainer artifacts
+    - name: Create and start Docker container
       run: |
         docker create --name my-container my-image
-        docker cp my-container:/app/publish/API ./api-artifacts
-        docker cp my-container:/app/publish/DataTrainer ./datatrainer-artifacts
-        docker rm my-container
+        docker start my-container
+
+    - name: Troubleshooting
+      run: docker exec -t my-container ls -la /app
+
+    - name: Extract API artifacts
+      run: docker cp my-container:/app/publish/API ./api-artifacts
+
+    - name: Extract DataTrainer artifacts
+      run: docker cp my-container:/app/publish/DataTrainer ./datatrainer-artifacts
+
+    - name: Delete container
+      run: docker rm my-container
 
     - name: Archive API artifacts
       uses: actions/upload-artifact@v2
