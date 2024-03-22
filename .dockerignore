@@ -19,7 +19,9 @@
 **/node_modules
 **/npm-debug.log
 **/obj
+**/publish
 **/secrets.dev.yaml
 **/values.dev.yaml
+Persistence/Migrations/
 LICENSE
 README.md
