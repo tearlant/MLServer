@@ -14,8 +14,10 @@ jobs:
     - name: Build Docker image
       run: docker build --progress plain -t my-image -f Dockerfile .
 
-    - name: Create Docker container
-      run: docker create --name my-container my-image
+    - name: Create and start Docker container
+      run: |
+        docker create --name my-container my-image
+        docker start my-container
 
     - name: Troubleshooting
       run: docker exec -t my-container ls la /app
