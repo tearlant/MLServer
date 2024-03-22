@@ -42,4 +42,4 @@ RUN ls -la /app/publish/DataTrainer
 #COPY --from=publish /app/publish/API .
 
 #ENTRYPOINT ["dotnet", "API.dll"]
-CMD echo "Finished"
+CMD ["sleep", "infinity"]
