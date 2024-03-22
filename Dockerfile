@@ -20,7 +20,7 @@ ENV PATH="$PATH:/root/.dotnet/tools"
 
 WORKDIR "/src"
 
-RUN dotnet ef migrations add InitialCreate -s API -p Persistence
+RUN dotnet ef migrations add InitialCreate -s API -p Persistence --verbose
 
 FROM build AS publish
 WORKDIR "/src/API"
