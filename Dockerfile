@@ -37,8 +37,9 @@ RUN ls -la /app/publish
 RUN ls -la /app/publish/API
 RUN ls -la /app/publish/DataTrainer
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish/API .
+#FROM base AS final
+#WORKDIR /app
+#COPY --from=publish /app/publish/API .
 
-ENTRYPOINT ["dotnet", "API.dll"]
+#ENTRYPOINT ["dotnet", "API.dll"]
+CMD echo "Finished"
