@@ -10,4 +10,5 @@ jobs:
     steps:
       # Retrieve the IP address of the GitHub Actions runner
       - name: Check Runner IP
-        run: echo "Runner IP: ${{ runner.ip }}"
+        run: |
+          echo "Runner IP: ${{ runner.ip }}"
