@@ -1,0 +1,8 @@
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Retrieve the IP address of the GitHub Actions runner
+    - name: Check Runner IP
+      run: echo "Runner IP: ${{ runner.ip }}"
