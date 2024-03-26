@@ -49,7 +49,7 @@ RUN echo "WORKDIR /app" >> /app/publish/API/Dockerfile
 RUN echo "COPY . ./" >> /app/publish/API/Dockerfile
 RUN echo "EXPOSE 443" >> /app/publish/API/Dockerfile
 RUN echo "EXPOSE 80" >> /app/publish/API/Dockerfile
-RUN echo "ENTRYPOINT [\"dotnet\", \"API.dll\"]" >> /app/publish/Dockerfile
+RUN echo "ENTRYPOINT [\"dotnet\", \"API.dll\"]" >> /app/publish/API/Dockerfile
 
 # In theory, the documentation I've read says I can extract the files from the images, but I can't make that work,
 # so the workaround is to have the container running indefinitely, and having the build server killing the container
