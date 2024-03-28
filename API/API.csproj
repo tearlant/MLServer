@@ -9,11 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="cert.pem" />
     <None Remove="InitialModels\Model-ANIMALS.zip" />
     <None Remove="InitialModels\Model-DIAMONDS.zip" />
     <None Remove="InitialModels\Model-FLOWERS.zip" />
-    <None Remove="key.pem" />
   </ItemGroup>
 
   <ItemGroup>
