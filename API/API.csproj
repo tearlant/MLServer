@@ -9,12 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="cert.pem" />
     <None Remove="InitialModels\Model-ANIMALS.zip" />
     <None Remove="InitialModels\Model-DIAMONDS.zip" />
     <None Remove="InitialModels\Model-FLOWERS.zip" />
+    <None Remove="key.pem" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="cert.pem">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="InitialModels\Model-ANIMALS.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -22,6 +27,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="InitialModels\Model-FLOWERS.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="key.pem">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
