@@ -46,6 +46,11 @@ RUN dotnet publish "DataTrainer.csproj" -c Release -o /app/publish/DataTrainer
 # Generate the Dockerfile for serving the app
 RUN echo "FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base" > /app/publish/API/Dockerfile
 RUN echo "WORKDIR /app" >> /app/publish/API/Dockerfile
+RUN echo "ARG CERT_PATH" >> /app/publish/API/Dockerfile
+RUN echo "ARG KEY_PATH" >> /app/publish/API/Dockerfile
+RUN echo "COPY $CERT_PATH /app/cert.pem" >> /app/publish/API/Dockerfile
+RUN echo "COPY $KEY_PATH /app/key.pem" >> /app/publish/API/Dockerfile
+
 RUN echo "COPY . ./" >> /app/publish/API/Dockerfile
 RUN echo "EXPOSE 443" >> /app/publish/API/Dockerfile
 RUN echo "EXPOSE 80" >> /app/publish/API/Dockerfile
