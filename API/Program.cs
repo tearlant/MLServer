@@ -39,7 +39,7 @@ builder.WebHost.ConfigureKestrel(options =>
 
         //workaround for windows issue https://github.com/dotnet/runtime/issues/23749#issuecomment-388231655
         //using var cert = X509Certificate2.CreateFromPemFile(certString, keyString);
-        using var cert = X509Certificate2.CreateFromPem(certFile, keyFile);
+        using var cert = X509Certificate2.CreateFromPemFile(certFile, keyFile);
         return new X509Certificate2(cert.Export(X509ContentType.Pkcs12));
     };
 
