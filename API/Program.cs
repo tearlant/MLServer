@@ -43,7 +43,7 @@ builder.WebHost.ConfigureKestrel(options =>
         return new X509Certificate2(cert.Export(X509ContentType.Pkcs12));
     };
 
-    var x509 = CreateCertFromPemFile(certPem, keyPem);
+    var x509 = CreateCertFromPemFile(certPath, keyPath);
 
     //var x509 = X509Certificate2.CreateFromPem(certPath, keyPath);
 
