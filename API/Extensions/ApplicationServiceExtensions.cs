@@ -39,7 +39,11 @@ namespace API.Extensions
                 "http://localhost:8080",
                 "https://localhost:8080",
                 "http://localhost",
-                "https://localhost"
+                "https://localhost",
+                "http://tearlant.com",
+                "http://www.tearlant.com",
+                "https://tearlant.com",
+                "https://www.tearlant.com",
             };
 
             services.AddCors(opt =>
