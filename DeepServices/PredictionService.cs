@@ -2,6 +2,7 @@
 using Domain;
 using Domain.Image;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.ML;
 using Microsoft.ML.Data;
@@ -38,6 +39,7 @@ namespace DeepServices
         private PredictionEngine<ImageModelRawInput, T>? _imagePreparationEngine;
         private readonly PredictionServiceCachingOptions _cachingOptions = new PredictionServiceCachingOptions();
         private readonly string _defaultModelPath = Path.Combine(AppContext.BaseDirectory, "InitialModels", "Model-DIAMONDS.zip");
+        private readonly ILogger _logger;
 
         private Dictionary<string, SessionModelData<T, S>> _modelDataDictionary = new Dictionary<string, SessionModelData<T, S>>();
 
@@ -58,8 +60,11 @@ namespace DeepServices
 
         public async Task LoadModelAsync(string sessionId, string modelPath, int imageHeight, int imageWidth)
         {
+            _logger.LogInformation("LoadModelAsync: DEBUG POINT 1");
             await UpdateSessionAsync();
+            _logger.LogInformation("LoadModelAsync: DEBUG POINT 2");
             CreateImageIngestionPipelineForModelWithImageInput(sessionId, modelPath, imageHeight, imageWidth);
+            _logger.LogInformation("LoadModelAsync: DEBUG POINT 3");
         }
 
         public async Task<S?> PredictSingleDataPointFromFormAsync(string sessionId, DataFromForm newDataPoint)
@@ -199,6 +204,8 @@ namespace DeepServices
         {
             // outputAsFloatArray might depend on the model, as do the height/width
 
+            _logger.LogInformation("CreateImageIngestionPipelineForModelWithImageInput: DEBUG POINT 1");
+
             _dataIngestionPipeline = _mlContext.Transforms.ResizeImages(outputColumnName: "input_1", imageWidth: imageWidth, imageHeight: imageHeight, inputColumnName: nameof(ImageModelRawInput.Image))
                 .Append(_mlContext.Transforms.ExtractPixels(outputColumnName: "input", interleavePixelColors: true, offsetImage: 117, inputColumnName: "input_1"));
 
@@ -207,10 +214,19 @@ namespace DeepServices
             var dataView = _mlContext.Data.LoadFromEnumerable(emptyData);
             var dataPrepPipeline = _dataIngestionPipeline.Fit(dataView);
 
+            _logger.LogInformation("CreateImageIngestionPipelineForModelWithImageInput: DEBUG POINT 2");
+
             _imagePreparationEngine = _mlContext.Model.CreatePredictionEngine<ImageModelRawInput, T>(dataPrepPipeline);
 
+            _logger.LogInformation("CreateImageIngestionPipelineForModelWithImageInput: DEBUG POINT 3");
+
             var model = _mlContext.Model.Load(modelPath, out var modelInputSchema);
+
+            _logger.LogInformation("CreateImageIngestionPipelineForModelWithImageInput: DEBUG POINT 4");
+
             var predEngine = _mlContext.Model.CreatePredictionEngine<T, S>(model);
+
+            _logger.LogInformation("CreateImageIngestionPipelineForModelWithImageInput: DEBUG POINT 5");
 
             var newModelData = new SessionModelData<T, S>
             {
@@ -227,6 +243,8 @@ namespace DeepServices
             {
                 _modelDataDictionary.Add(sessionId, newModelData);
             }
+
+            _logger.LogInformation("CreateImageIngestionPipelineForModelWithImageInput: DEBUG POINT 6");
 
         }
 
