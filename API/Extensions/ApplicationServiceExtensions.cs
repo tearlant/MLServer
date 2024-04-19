@@ -69,6 +69,9 @@ namespace API.Extensions
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
+            // Add logging services
+            services.AddLogging();
+
             services.Configure<PredictionServiceCachingOptions>(config.GetSection("PredictionServiceCachingOptions"));
             services.AddSingleton<IPredictionService<ImageModelInput, ImageModelOutput>, PredictionService<ImageModelInput, ImageModelOutput>>();
 
