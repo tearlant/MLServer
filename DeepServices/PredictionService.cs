@@ -43,10 +43,11 @@ namespace DeepServices
 
         private Dictionary<string, SessionModelData<T, S>> _modelDataDictionary = new Dictionary<string, SessionModelData<T, S>>();
 
-        public PredictionService(IHttpContextAccessor httpContextAccessor, IOptions<PredictionServiceCachingOptions> cachingOptions) : base(httpContextAccessor, TimeSpan.FromMinutes(20), TimeSpan.FromMinutes(10))
+        public PredictionService(IHttpContextAccessor httpContextAccessor, IOptions<PredictionServiceCachingOptions> cachingOptions, ILogger logger) : base(httpContextAccessor, TimeSpan.FromMinutes(20), TimeSpan.FromMinutes(10))
         {
             _mlContext = new MLContext();
             _cachingOptions = cachingOptions.Value;
+            _logger = logger;
 
             if (!Directory.Exists(CachingDirectory))
             {
