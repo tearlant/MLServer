@@ -11,6 +11,7 @@ namespace API.Controllers
 
         [HttpGet] //api/models
         public async Task<ActionResult<List<MLModelMetadata>>> GetModels() {
+            Logger.LogInformation("Calling Models endpoint");
             return await Mediator.Send(new List.Query());
         }
 

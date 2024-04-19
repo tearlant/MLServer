@@ -15,10 +15,12 @@ namespace API.Controllers
         private IPredictionService<ImageModelInput, ImageModelOutput> _predictionService;
         private IWebHostEnvironment _webHostEnvironment;
         private SafeModeService _safeModeService;
+        private ILogger<Program> _logger;
 
         protected IMediator Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>();
         protected IPredictionService<ImageModelInput, ImageModelOutput> PredictionService => _predictionService ??= HttpContext.RequestServices.GetService<IPredictionService<ImageModelInput, ImageModelOutput>>();
         protected SafeModeService SafeModeService => _safeModeService ??= HttpContext.RequestServices.GetService<SafeModeService>();
+        protected ILogger Logger => _logger ??= HttpContext.RequestServices.GetService<ILogger<Program>>();
 
         // Not sure if this is still needed, but it determines path resolution, so I'm keeping it to be safe.
         protected IWebHostEnvironment WebHostEnvironment => _webHostEnvironment ??= HttpContext.RequestServices.GetService<IWebHostEnvironment>();
