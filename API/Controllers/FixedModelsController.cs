@@ -45,7 +45,10 @@ namespace API.Controllers
             var modelPath = Path.Combine(AppContext.BaseDirectory, "InitialModels", "Model-ANIMALS.zip");
             Logger.LogInformation($"modelPath = {modelPath}");
 
-            await PredictionService.LoadModelAsync(sessionId, modelPath, 224, 224);
+            await Task.Run(() =>
+            {
+                PredictionService.LoadModelAsync(sessionId, modelPath, 224, 224);
+            });
 
             Logger.LogInformation("Returning from Animals endpoint");
 
