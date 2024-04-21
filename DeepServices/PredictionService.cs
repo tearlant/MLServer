@@ -55,8 +55,9 @@ namespace DeepServices
             }
 
             // For the sake of testing the API, create a session with id "TestSession" which will never be cleared.
+            //TODO: Remove
 
-            CreateImageIngestionPipelineForModelWithImageInput("TestSession", _defaultModelPath, 224, 224);
+            //CreateImageIngestionPipelineForModelWithImageInput("TestSession", _defaultModelPath, 224, 224);
         }
 
         public async Task LoadModelAsync(string sessionId, string modelPath, int imageHeight, int imageWidth)
@@ -64,7 +65,7 @@ namespace DeepServices
             _logger.LogInformation("LoadModelAsync: DEBUG POINT 1");
             await UpdateSessionAsync();
             _logger.LogInformation("LoadModelAsync: DEBUG POINT 2");
-            CreateImageIngestionPipelineForModelWithImageInput(sessionId, modelPath, imageHeight, imageWidth);
+            await CreateImageIngestionPipelineForModelWithImageInputAsync(sessionId, modelPath, imageHeight, imageWidth);
             _logger.LogInformation("LoadModelAsync: DEBUG POINT 3");
         }
 
@@ -180,7 +181,7 @@ namespace DeepServices
 
         protected override async Task OnNewSessionAsync(string sessionId)
         {
-            CreateImageIngestionPipelineForModelWithImageInput(sessionId, _defaultModelPath, 224, 224);
+            await CreateImageIngestionPipelineForModelWithImageInputAsync(sessionId, _defaultModelPath, 224, 224);
 
         }
 
@@ -201,7 +202,7 @@ namespace DeepServices
             return imageModelInput;
         }
 
-        private void CreateImageIngestionPipelineForModelWithImageInput(string sessionId, string modelPath, int imageHeight, int imageWidth)
+        private async Task CreateImageIngestionPipelineForModelWithImageInputAsync(string sessionId, string modelPath, int imageHeight, int imageWidth)
         {
             // outputAsFloatArray might depend on the model, as do the height/width
 
@@ -221,7 +222,15 @@ namespace DeepServices
 
             _logger.LogInformation("CreateImageIngestionPipelineForModelWithImageInput: DEBUG POINT 3");
 
-            var model = _mlContext.Model.Load(modelPath, out var modelInputSchema);
+            ITransformer? model = null;
+
+            await Task.Run(() =>
+            {
+                _logger.LogInformation("CreateImageIngestionPipelineForModelWithImageInput: DEBUG inside Task.Run");
+                model = _mlContext.Model.Load(modelPath, out var modelInputSchema);
+            });
+
+            if (model == null) return;
 
             _logger.LogInformation("CreateImageIngestionPipelineForModelWithImageInput: DEBUG POINT 4");
 
