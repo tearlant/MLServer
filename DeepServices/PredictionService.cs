@@ -38,7 +38,7 @@ namespace DeepServices
         private IEstimator<ITransformer>? _dataIngestionPipeline;
         private PredictionEngine<ImageModelRawInput, T>? _imagePreparationEngine;
         private readonly PredictionServiceCachingOptions _cachingOptions = new PredictionServiceCachingOptions();
-        private readonly string _defaultModelPath = Path.Combine(AppContext.BaseDirectory, "InitialModels", "Model-DIAMONDS.zip");
+        private readonly string _defaultModelPath = Path.Combine(AppContext.BaseDirectory, "InitialModels", "Model-ANIMALS.zip");
         private readonly ILogger _logger;
 
         private Dictionary<string, SessionModelData<T, S>> _modelDataDictionary = new Dictionary<string, SessionModelData<T, S>>();
